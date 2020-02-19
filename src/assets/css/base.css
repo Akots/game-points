@@ -1,0 +1,104 @@
+@charset "UTF-8";
+/*
+Author: Kotsuruba Alexander
+**********
+*/
+   
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q,
+small, strike, strong, sub, sup, tt,
+b, u, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+header, nav, footer, section {
+   background: transparent;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   outline: 0;
+   vertical-align: baseline;
+}
+
+body {
+   color: #41424E;
+   font-size: 1rem;
+   font-weight: 400;
+   line-height: 1.5;
+   text-align: left;
+}
+
+/* The Begining of the End (default styles)
+----------------------------------------------- */
+
+fieldset, img, a img { border: 0 solid; }
+
+a {
+   text-decoration: none;
+}
+ol, ul { list-style: none outside; }
+
+
+/* Coding
+----------------------------------------------- */
+.game {
+   margin: 10rem auto;
+}
+
+
+.game-board-cont {
+   padding-top: 2rem;
+}
+.game-board {
+   border-top: 1px solid #CCC;
+   border-left: 1px solid #CCC;
+   display: flex;
+   flex-wrap: wrap;
+   align-content: start;
+   width: 20rem;
+   height: 20rem;
+   margin: 0 auto;
+}
+.game-board-cont .status-message {
+   width: 16rem;
+   margin: -2rem auto 2rem;
+   text-align: center;
+}
+
+.game-board-cell {
+   border: 1px solid #CCC;
+   border-top: none;
+   border-left: none;
+   flex-basis: 20%;
+   height: 20%;
+   cursor: pointer;
+   }
+.game-board-locked .game-board-cell {
+   cursor: default;
+   }
+.game-board .game-board-row:first-child .game-board-cell {
+   border-top: 1px solid #CCC;
+   }
+.game-board .game-board-row .game-board-cell:first-child {
+   border-left: 1px solid #CCC;
+}
+.game-board-cell--highlight {
+   background-color: var(--blue);
+}
+.game-board-cell--win {
+   background-color: var(--green);
+}
+.game-board-cell--miss {
+   background-color: var(--red);
+}
+
+.leaderboard-table {
+   overflow: auto;
+   max-height: 400px;
+}
+
+.gamer-setup {
+   justify-content: center;
+}
