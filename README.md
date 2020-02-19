@@ -1,2 +1,2 @@
 # Game points game on Vue.js as test assignment
-# [game](https://github.com/Akots/game-points/) 
+# [game](https://akots.github.io/game-points/) 
