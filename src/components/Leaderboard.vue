@@ -15,35 +15,13 @@
 </template>
 
 <script>
-   import axios from 'axios';
-
    export default {
-      props: ['initUpdate'],
+      props: ['initLeadersData'],
 
       data() {
          return {
-            leadersData: []
+            leadersData: this.initLeadersData
          };
-      },
-
-      watch: {
-         initUpdate(val) {
-            if (val == true) {
-               this.setData();   
-            }
-         }
-      },
-         
-      mounted() {
-         this.setData();
-      },
-
-      methods: {
-         setData() {
-            axios
-               .get('https://starnavi-frontend-test-task.herokuapp.com/winners')
-               .then(response => (this.leadersData = response.data));
-         }
       }
    }
 </script>

@@ -1,7 +1,7 @@
 <template>
-  <div class="game container">
-       <div class="row">
-          <div class="col">
+   <div class="game container">
+      <div class="row">
+         <div class="col">
              <user-setup
                 v-if="settingsLoaded"
                 v-bind:initialGameModes="gameModes"
@@ -9,55 +9,58 @@
                 v-on:start-game="startGame"
                 ></user-setup>
 
-             <hr>
+            <hr>
 
-             <div class="game-board-cont">
-                <div v-if="showResult" class="status-message alert alert-primary" role="alert">{{resultsMessage}}</div>
+            <div class="game-board-cont">
+               <div v-if="showResult" class="status-message alert alert-primary" role="alert">{{resultsMessage}}</div>
 
-                <div class="game-board"
+               <div class="game-board"
                    v-bind:class="{'game-board-locked': gameBoardLocked}"
                    v-bind:style="boardSize">
-                   <div class="game-board-cell"
+                  <div class="game-board-cell"
                       v-for="item in gameBoardItems"
-                      v-on:click="gameRowClick(item.id, $event)"
+                      v-on:click.prevent="gameRowClick(item.id, $event)"
                       v-bind:key="item.id"
                       v-bind:class="{'game-board-cell--highlight' : item.highlight, 'game-board-cell--win' : item.state == 'win', 'game-board-cell--miss' : item.state == 'miss'}"
                       v-bind:style="cellSize"
                       >
-                      </div>
+                     </div>
                 </div>
              </div>
              
-          </div>
+         </div>
           
-          <div class="col">
-             <leaderboard 
-                :initUpdate="updateLeaderboard"
-                ></leaderboard>
-          </div>
-       </div>
-    </div>
+         <div class="col">
+            <leader-board
+               v-if="leadersLoaded"
+               v-bind:init-leaders-data="leadersData"
+            ></leader-board>
+         </div>
+      </div>
+   </div>
 </template>
 
 <script>
 import axios from 'axios';
 
 import UserSetup  from './components/UserSetup.vue';
-import Leaderboard from './components/Leaderboard.vue';
+import LeaderBoard from './components/Leaderboard.vue';
 
 export default {
    name: 'app',
 
    components: {
       UserSetup,
-      Leaderboard
+      LeaderBoard
    },
 
    data() {
       return {
          gameModes: [],
+         leadersData: [],
+
          settingsLoaded: false,
-         updateLeaderboard: false,
+         leadersLoaded: false,
 
          gameInProcess: false,
          gameBoardLocked: true,
@@ -90,18 +93,47 @@ export default {
       }
    },
 
-   mounted() {
-      let _this = this;
+   beforeMount() {
+      this.setGameModes();
+      this.setLeadersData();
+   },
 
-      axios
-         .get('https://starnavi-frontend-test-task.herokuapp.com/game-settings')
-         .then(response => {
-            _this.setGameModes(response.data);
-            _this.initGame(this.gameModes[0]);
-         });
+   watch: {
+      leadersData: function(val){
+         console.log(val);
+      }
    },
 
    methods: {
+      setGameModes() {
+         const _this = this;
+
+         axios
+            .get('https://starnavi-frontend-test-task.herokuapp.com/game-settings')
+            .then(response => {
+               var data = response.data;
+               var gameModes = Object.entries(data);
+
+               for (let [mode, value] of gameModes) {
+                  _this.gameModes.push({'name': mode, 'mode': value});
+               }
+
+               _this.settingsLoaded = true;
+               _this.initGame(this.gameModes[0]);
+            });
+      },
+
+      setLeadersData() {
+         const _this = this;
+
+         axios
+            .get('https://starnavi-frontend-test-task.herokuapp.com/winners')
+            .then(response => {
+               _this.leadersData = response.data;
+               _this.leadersLoaded = true;
+            })
+      },
+
       initGame(params) {
          this.highlightPointDelay = params.mode.delay;
          this.dessapearPointDelay = params.mode.delay * 2;
@@ -113,7 +145,6 @@ export default {
       },
 
       startGame(params) {
-         this.updateLeaderboard = false;
          this.showResult = false;
          this.gameBoardLocked = false;
          this.gameInProcess = true;
@@ -122,24 +153,10 @@ export default {
          this.renderPointsShow();
       },
 
-      setGameModes(data) {
-         let gameModes = Object.entries(data);
-
-         for (let [mode, value] of gameModes) {
-            this.gameModes.push({'name': mode, 'mode': value});
-         }
-
-         /*for (let [mode, value] in gameModes) {
-            this.gameModes.push({name: mode, mode: value});
-         }*/
-
-         this.settingsLoaded = true;
-      },
-
       getHighlightedPoint(){
-         let point = null;
+         var point = null;
 
-         for (var i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
+         for (let i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
             if (this.gameBoardItems[i].highlight == true) {
                point = this.gameBoardItems[i];
 
@@ -151,9 +168,9 @@ export default {
       },
 
       getOpenPoints(){
-         let pointsId = [];
+         var pointsId = [];
 
-         for (var i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
+         for (let i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
             if (this.gameBoardItems[i].state == null) {
                pointsId.push(this.gameBoardItems[i].id);
             }
@@ -163,9 +180,9 @@ export default {
       },
 
       calculatePointPlace() {
-         let openPointsId = this.getOpenPoints();
-         let newPointId;
-         let minNumber = 1;
+         var openPointsId = this.getOpenPoints();
+         var newPointId;
+         var minNumber = 1;
 
          newPointId = Math.floor(Math.random() * (this.gameBoardItemsNumb)) + minNumber;
 
@@ -175,11 +192,9 @@ export default {
             false);
       },
 
-      gameRowClick(itemId, event) {
-         event.preventDefault();
-
-         let pointClicked = this.gameBoardItems[itemId - 1];
-         let pointHighlighted = this.getHighlightedPoint();
+      gameRowClick(itemId) {
+         var pointClicked = this.gameBoardItems[itemId - 1];
+         var pointHighlighted = this.getHighlightedPoint();
 
          if (this.gameBoardLocked || !pointHighlighted) return false;
 
@@ -227,7 +242,7 @@ export default {
       },
 
       renderPointResult() {
-         let boardItem = this.getHighlightedPoint();
+         var boardItem = this.getHighlightedPoint();
 
          boardItem.highlight = false;
 
@@ -235,7 +250,7 @@ export default {
             boardItem.state = "miss";
          }
 
-         let gameResults = this.getGameResults();
+         const gameResults = this.getGameResults();
 
          if (gameResults.finished) {
             this.renderResultMessage();
@@ -247,11 +262,11 @@ export default {
       },
 
       getGameResults() {
-         let missPointsId = [];
-         let winPointsId = [];
-         let winScore = Math.floor(this.gameBoardItemsNumb/2);
+         var missPointsId = [];
+         var winPointsId = [];
+         var winScore = Math.floor(this.gameBoardItemsNumb/2);
 
-         for (var i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
+         for (let i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
             if (this.gameBoardItems[i].state != null) {
 
                if (this.gameBoardItems[i].state == "win") {
@@ -272,13 +287,13 @@ export default {
       generatePointsData() {
          this.gameBoardItems = [];
 
-         for (var i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
+         for (let i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
             this.gameBoardItems.push({"id" : (i + 1), "highlight" : false, "state" : null});
          }
       },
 
       renderResultMessage() {
-         let gameResults = this.getGameResults();
+         const gameResults = this.getGameResults();
 
          this.showResult = true;
          this.gameInProcess = false;
@@ -292,11 +307,11 @@ export default {
       },
 
       getFormattedDate() {
-         let months    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-         let now       = new Date();
-         let hours = now.getHours();
-         let minutes = now.getMinutes();
-         let thisMonth = months[now.getMonth()];
+         const months    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+         const now       = new Date();
+         var hours = now.getHours();
+         var minutes = now.getMinutes();
+         const thisMonth = months[now.getMonth()];
 
          hours = (hours<10) ? '0' + hours : hours;
          minutes = (minutes<10) ? '0' + minutes : minutes;
@@ -305,19 +320,26 @@ export default {
       },
 
       saveResults(winner) {
-         let date = this.getFormattedDate();
-         let winnerName = winner == "user" ? this.userName : "Computer";
+         var date = this.getFormattedDate();
+         var winnerName = (winner == "user" ? this.userName : "Computer");
+         var _this = this;
 
          axios
             .post('https://starnavi-frontend-test-task.herokuapp.com/winners', {
                'winner': winnerName,
                'date': date
+            }).then(response => {
+               const data = response.data;
+               var newEnties = data.slice(_this.leadersData.length);
+
+               newEnties.forEach(entry => (_this.leadersData.push(entry)));
             });
       }
    }
 }
 </script>
 
-<style>
-   @import url("./assets/css/base.css");
+<style lang="scss">
+  @import '~bootstrap/scss/bootstrap.scss';
+  @import './assets/css/base.scss';
 </style>

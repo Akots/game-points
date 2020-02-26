@@ -16,7 +16,7 @@
             v-model="userName">
       </div>
       
-      <button v-on:click.prevent="startGame" class="btn btn-primary mb-2" v-bind:disabled="disabled">{{buttonName}}</button>
+      <button v-on:click.prevent="startGame" class="btn btn-primary mb-2" v-bind:disabled="disabled">{{firstPlay ? 'Play!' : 'Replay'}}</button>
    </form>
 </template>
 
@@ -28,9 +28,8 @@
          return {
             gameModes: this.initialGameModes,
 
+            firstPlay: true,
             disabled: true,
-
-            buttonName: 'Play!',
 
             userName: '',
             userSettings: null
@@ -52,13 +51,13 @@
 
          initReplay: function(){
             if (this.initReplay){
+               this.firstPlay = false;
                this.disabled = false;
-               this.buttonName = 'Replay';
             }
          }
       },
 
-      beforeMount(){
+      mounted(){
          this.setDefaultMode();
       },
          

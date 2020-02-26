@@ -3,43 +3,6 @@
 Author: Kotsuruba Alexander
 **********
 */
-   
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, font, img, ins, kbd, q,
-small, strike, strong, sub, sup, tt,
-b, u, i,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-header, nav, footer, section {
-   background: transparent;
-   margin: 0;
-   padding: 0;
-   border: 0;
-   outline: 0;
-   vertical-align: baseline;
-}
-
-body {
-   color: #41424E;
-   font-size: 1rem;
-   font-weight: 400;
-   line-height: 1.5;
-   text-align: left;
-}
-
-/* The Begining of the End (default styles)
------------------------------------------------ */
-
-fieldset, img, a img { border: 0 solid; }
-
-a {
-   text-decoration: none;
-}
-ol, ul { list-style: none outside; }
-
 
 /* Coding
 ----------------------------------------------- */
