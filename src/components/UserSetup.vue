@@ -63,7 +63,7 @@
          
       methods: {
          setDefaultMode() {
-            for (var i = this.gameModes.length - 1; i >= 0; i--) {
+            for (let i = this.gameModes.length - 1; i >= 0; i--) {
                if (this.gameModes[i].selected) {
                   this.userSettings = this.gameModes[i];
 

@@ -98,16 +98,8 @@ export default {
       this.setLeadersData();
    },
 
-   watch: {
-      leadersData: function(val){
-         console.log(val);
-      }
-   },
-
    methods: {
       setGameModes() {
-         const _this = this;
-
          axios
             .get('https://starnavi-frontend-test-task.herokuapp.com/game-settings')
             .then(response => {
@@ -115,22 +107,20 @@ export default {
                var gameModes = Object.entries(data);
 
                for (let [mode, value] of gameModes) {
-                  _this.gameModes.push({'name': mode, 'mode': value});
+                  this.gameModes.push({'name': mode, 'mode': value});
                }
 
-               _this.settingsLoaded = true;
-               _this.initGame(this.gameModes[0]);
+               this.settingsLoaded = true;
+               this.initGame(this.gameModes[0]);
             });
       },
 
       setLeadersData() {
-         const _this = this;
-
          axios
             .get('https://starnavi-frontend-test-task.herokuapp.com/winners')
             .then(response => {
-               _this.leadersData = response.data;
-               _this.leadersLoaded = true;
+               this.leadersData = response.data;
+               this.leadersLoaded = true;
             })
       },
 
@@ -154,7 +144,7 @@ export default {
       },
 
       getHighlightedPoint(){
-         var point = null;
+         let point = null;
 
          for (let i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
             if (this.gameBoardItems[i].highlight == true) {
@@ -168,7 +158,7 @@ export default {
       },
 
       getOpenPoints(){
-         var pointsId = [];
+         let pointsId = [];
 
          for (let i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
             if (this.gameBoardItems[i].state == null) {
@@ -180,21 +170,20 @@ export default {
       },
 
       calculatePointPlace() {
-         var openPointsId = this.getOpenPoints();
-         var newPointId;
-         var minNumber = 1;
+         let openPointsId = this.getOpenPoints();
+         let newPointId;
+         let minNumber = 1;
 
          newPointId = Math.floor(Math.random() * (this.gameBoardItemsNumb)) + minNumber;
 
-         return (
-            openPointsId.length ? 
-               (openPointsId.includes(newPointId) ? newPointId : this.calculatePointPlace()) : 
-            false);
+         return (openPointsId.length ? 
+                     (openPointsId.includes(newPointId) ? newPointId : this.calculatePointPlace()) 
+                : false);
       },
 
       gameRowClick(itemId) {
-         var pointClicked = this.gameBoardItems[itemId - 1];
-         var pointHighlighted = this.getHighlightedPoint();
+         let pointClicked = this.gameBoardItems[itemId - 1];
+         let pointHighlighted = this.getHighlightedPoint();
 
          if (this.gameBoardLocked || !pointHighlighted) return false;
 
@@ -215,34 +204,31 @@ export default {
       },
 
       renderPointsShow() {
-         let _this = this;
-
          this.gameBoardLocked = false;
 
-         this.showPointInterval = setTimeout(function(){
-            let newPointId = _this.calculatePointPlace();
+         this.showPointInterval = setTimeout(() => {
+            let newPointId = this.calculatePointPlace();
 
             if (newPointId) {
-               let boardItem = _this.gameBoardItems[newPointId - 1];
+               let boardItem = this.gameBoardItems[newPointId - 1];
 
                boardItem.highlight = true;
 
-               _this.finishShowPointInterval = setTimeout(function(){
-                  _this.gameBoardLocked = true;
-                  _this.renderPointResult();
+               this.finishShowPointInterval = setTimeout(() => {
+                  this.gameBoardLocked = true;
+                  this.renderPointResult();
 
-               }, _this.dessapearPointDelay);
+               }, this.dessapearPointDelay);
             }
             else {
-               _this.renderResultMessage();
+               this.renderResultMessage();
             }
-            
 
-         }, this.highlightPointDelay)
+         }, this.highlightPointDelay);
       },
 
       renderPointResult() {
-         var boardItem = this.getHighlightedPoint();
+         let boardItem = this.getHighlightedPoint();
 
          boardItem.highlight = false;
 
@@ -262,9 +248,9 @@ export default {
       },
 
       getGameResults() {
-         var missPointsId = [];
-         var winPointsId = [];
-         var winScore = Math.floor(this.gameBoardItemsNumb/2);
+         let missPointsId = [];
+         let winPointsId = [];
+         let winScore = Math.floor(this.gameBoardItemsNumb/2);
 
          for (let i = 0; i <= this.gameBoardItemsNumb - 1; i++) {
             if (this.gameBoardItems[i].state != null) {
@@ -320,19 +306,19 @@ export default {
       },
 
       saveResults(winner) {
-         var date = this.getFormattedDate();
-         var winnerName = (winner == "user" ? this.userName : "Computer");
-         var _this = this;
+         let date = this.getFormattedDate();
+         let winnerName = (winner == "user" ? this.userName : "Computer");
 
          axios
             .post('https://starnavi-frontend-test-task.herokuapp.com/winners', {
                'winner': winnerName,
                'date': date
             }).then(response => {
-               const data = response.data;
-               var newEnties = data.slice(_this.leadersData.length);
+               if (response.data && response.data.length) {
+                  let newEnties = response.data.slice(this.leadersData.length);
 
-               newEnties.forEach(entry => (_this.leadersData.push(entry)));
+                  newEnties.forEach(entry => (this.leadersData.push(entry)));
+               }
             });
       }
    }
